@@ -8,5 +8,9 @@ actual fun createMediaServiceHandler(
     analyticsRepository: com.maxrave.domain.repository.AnalyticsRepository,
     coroutineScope: kotlinx.coroutines.CoroutineScope,
 ): com.maxrave.domain.mediaservice.handler.MediaPlayerHandler {
-    TODO("Not yet implemented")
+    return IosMediaServiceHandlerImpl(
+        dataStoreManager = dataStoreManager,
+        streamRepository = streamRepository,
+        coroutineScope = coroutineScope,
+    )
 }
