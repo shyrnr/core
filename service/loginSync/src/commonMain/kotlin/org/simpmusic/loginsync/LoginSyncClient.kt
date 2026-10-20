@@ -10,6 +10,7 @@ import io.ktor.client.statement.bodyAsBytes
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.channelFlow
@@ -30,7 +31,7 @@ class LoginSyncClient {
         }
 
     // Owns the goodbye sent by disconnect(), which must outlive the caller's scope.
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     private var invite: LoginSyncInvite? = null
 

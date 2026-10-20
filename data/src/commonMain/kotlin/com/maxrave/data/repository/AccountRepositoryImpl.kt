@@ -7,6 +7,7 @@ import com.maxrave.domain.data.model.account.AccountInfo
 import com.maxrave.domain.repository.AccountRepository
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -34,30 +35,30 @@ internal class AccountRepositoryImpl(
                     Logger.e(TAG, "getAccountInfo: ${it.message}", it)
                     emit(emptyList())
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun insertGoogleAccount(googleAccountEntity: GoogleAccountEntity) =
         flow {
             emit(localDataSource.insertGoogleAccount(googleAccountEntity))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getGoogleAccounts(): Flow<List<GoogleAccountEntity>?> =
         flow<List<GoogleAccountEntity>?> { emit(localDataSource.getGoogleAccounts()) }.flowOn(
-            Dispatchers.IO,
+            ioDispatcher,
         )
 
     override fun getUsedGoogleAccount(): Flow<GoogleAccountEntity?> =
         flow<GoogleAccountEntity?> { emit(localDataSource.getUsedGoogleAccount()) }.flowOn(
-            Dispatchers.IO,
+            ioDispatcher,
         )
 
     override suspend fun deleteGoogleAccount(email: String) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.deleteGoogleAccount(email)
         }
 
     override fun updateGoogleAccountUsed(
         email: String,
         isUsed: Boolean,
-    ): Flow<Int> = flow { emit(localDataSource.updateGoogleAccountUsed(email, isUsed)) }.flowOn(Dispatchers.IO)
+    ): Flow<Int> = flow { emit(localDataSource.updateGoogleAccountUsed(email, isUsed)) }.flowOn(ioDispatcher)
 }

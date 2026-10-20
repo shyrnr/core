@@ -13,6 +13,7 @@ import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.kotlinytmusicscraper.models.AlbumItem
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -29,12 +30,12 @@ internal class AlbumRepositoryImpl(
     override fun getAllAlbums(limit: Int): Flow<List<AlbumEntity>> =
         flow {
             emit(localDataSource.getAllAlbums(limit))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAlbum(id: String): Flow<AlbumEntity?> =
         flow {
             emit(localDataSource.getAlbum(id))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAlbumAsFlow(id: String) = localDataSource.getAlbumAsFlow(id)
 
@@ -48,12 +49,12 @@ internal class AlbumRepositoryImpl(
                     )
                 },
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun insertAlbum(albumEntity: AlbumEntity) =
         flow {
             emit(localDataSource.insertAlbum(albumEntity))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun updateAlbumLiked(
         albumId: String,
@@ -78,12 +79,12 @@ internal class AlbumRepositoryImpl(
     }
 
     override suspend fun insertFollowedArtistSingleAndAlbum(followedArtistSingleAndAlbum: FollowedArtistSingleAndAlbum) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.insertFollowedArtistSingleAndAlbum(followedArtistSingleAndAlbum)
         }
 
     override suspend fun deleteFollowedArtistSingleAndAlbum(channelId: String) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.deleteFollowedArtistSingleAndAlbum(channelId)
         }
 
@@ -94,12 +95,12 @@ internal class AlbumRepositoryImpl(
                     localDataSource.getAllFollowedArtistSingleAndAlbums(limit, offset)
                 }
             emit(list)
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun getFollowedArtistSingleAndAlbum(channelId: String): Flow<FollowedArtistSingleAndAlbum?> =
         flow {
             emit(localDataSource.getFollowedArtistSingleAndAlbum(channelId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAlbumData(browseId: String): Flow<Resource<AlbumBrowse>> =
         flow {
@@ -113,7 +114,7 @@ internal class AlbumRepositoryImpl(
                         emit(Resource.Error(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAlbumMore(
         browseId: String,
@@ -141,5 +142,5 @@ internal class AlbumRepositoryImpl(
                         emit(null)
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

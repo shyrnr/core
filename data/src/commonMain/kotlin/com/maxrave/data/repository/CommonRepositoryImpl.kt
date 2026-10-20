@@ -16,6 +16,7 @@ import com.maxrave.kotlinytmusicscraper.models.YouTubeLocale
 import com.maxrave.logger.Logger
 import com.maxrave.spotify.Spotify
 import kotlinx.coroutines.CoroutineScope
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -128,7 +129,7 @@ internal class CommonRepositoryImpl(
                         enabled to baseData.copy(username = username, password = password)
                     }.distinctUntilChanged().collectLatest { (usingProxy, data) ->
                         if (usingProxy) {
-                            withContext(Dispatchers.IO) {
+                            withContext(ioDispatcher) {
                                 // Set SOCKS proxy authenticator if credentials are provided
                                 if (data.type == DataStoreManager.ProxyType.PROXY_TYPE_SOCKS &&
                                     data.username.isNotEmpty() && data.password.isNotEmpty()
@@ -312,7 +313,7 @@ internal class CommonRepositoryImpl(
     override fun getAllRecentData(): Flow<List<RecentlyType>> =
         flow {
             emit(localDataSource.getAllRecentData())
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getLibraryOverview(): Flow<LibraryOverview> =
         combine(
@@ -326,7 +327,7 @@ internal class CommonRepositoryImpl(
         ) { favorite, followed, mostPlayed, downloaded ->
             LibraryOverview(favorite, followed, mostPlayed, downloaded)
         }.distinctUntilChanged()
-            .flowOn(Dispatchers.IO)
+            .flowOn(ioDispatcher)
 
     private fun collectionPreview(
         count: Flow<Int>,
@@ -335,22 +336,22 @@ internal class CommonRepositoryImpl(
 
     // Notifications
     override suspend fun insertNotification(notificationEntity: NotificationEntity) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.insertNotification(notificationEntity)
         }
 
     override suspend fun getAllNotifications(): Flow<List<NotificationEntity>?> =
         flow {
             emit(localDataSource.getAllNotification())
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun isNotificationExists(link: String): Boolean =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.countNotificationByLink(link) > 0
         }
 
     override suspend fun deleteNotification(id: Long) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.deleteNotification(id)
         }
 
@@ -377,7 +378,7 @@ internal class CommonRepositoryImpl(
         url: String,
         packageName: String,
     ): CookieItem =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             return@withContext getCookies(
                 url,
                 packageName,

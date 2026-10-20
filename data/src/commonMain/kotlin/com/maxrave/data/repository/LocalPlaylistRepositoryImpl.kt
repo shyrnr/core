@@ -41,6 +41,7 @@ import com.maxrave.kotlinytmusicscraper.pages.SearchPage
 import com.maxrave.kotlinytmusicscraper.parser.getPlaylistContinuation
 import com.maxrave.kotlinytmusicscraper.parser.playlistContinuationContents
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
@@ -70,17 +71,17 @@ internal class LocalPlaylistRepositoryImpl(
                     localDataSource.getAllLocalPlaylists(limit, offset)
                 }
             emit(list)
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun updateLocalPlaylistTracks(
         tracks: List<String>,
         id: Long,
-    ) = withContext(Dispatchers.IO) { localDataSource.updateLocalPlaylistTracks(tracks, id) }
+    ) = withContext(ioDispatcher) { localDataSource.updateLocalPlaylistTracks(tracks, id) }
 
     override suspend fun updateLocalPlaylistDownloadState(
         downloadState: Int,
         id: Long,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         localDataSource.updateLocalPlaylistDownloadState(
             downloadState,
             id,
@@ -90,7 +91,7 @@ internal class LocalPlaylistRepositoryImpl(
     override suspend fun updateLocalPlaylistYouTubePlaylistSyncState(
         id: Long,
         syncState: Int,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         localDataSource.updateLocalPlaylistYouTubePlaylistSyncState(id, syncState)
     }
 
@@ -103,7 +104,7 @@ internal class LocalPlaylistRepositoryImpl(
                     localDataSource.getAllDownloadingLocalPlaylists(limit, offset)
                 },
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun listTrackFlow(id: Long): Flow<List<String>> =
         localDataSource
@@ -126,7 +127,7 @@ internal class LocalPlaylistRepositoryImpl(
             // id lookup returns them in whatever order the database finds them.
             val byId = localDataSource.getSongByListVideoIdFull(pairs.map { it.songId }).associateBy { it.videoId }
             emit(pairs.mapNotNull { pair -> byId[pair.songId]?.let { it to pair } })
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getTracksPaging(
         id: Long,
@@ -239,7 +240,7 @@ internal class LocalPlaylistRepositoryImpl(
             }.onFailure {
                 emit(LocalResource.Error<String>(it.message ?: errorMessage))
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun updateThumbnailLocalPlaylist(
         id: Long,
@@ -262,7 +263,7 @@ internal class LocalPlaylistRepositoryImpl(
         }.onFailure {
             emit(LocalResource.Error<String>(it.message ?: "Error updating playlist thumbnail"))
         }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override fun updateDownloadState(
         id: Long,
@@ -362,7 +363,7 @@ internal class LocalPlaylistRepositoryImpl(
                     emit(LocalResource.Error("Can't get setVideoId"))
                 }
         }.flowOn(
-            Dispatchers.IO,
+            ioDispatcher,
         )
 
     /**
@@ -617,7 +618,7 @@ internal class LocalPlaylistRepositoryImpl(
                         emit(LocalResource.Error<String>("$errorMessage: ${it.message}"))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun removeTrackFromLocalPlaylist(
         id: Long,
@@ -657,7 +658,7 @@ internal class LocalPlaylistRepositoryImpl(
                     emit(LocalResource.Error<String>("$errorMessage: SetVideoId is null"))
                 }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     /**
      * The stored entry of [videoId] in the YouTube playlist [youtubePlaylistId], matched with and
@@ -745,7 +746,7 @@ internal class LocalPlaylistRepositoryImpl(
                         emit(LocalResource.Error(exception.message ?: "Error"))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getYouTubeSetVideoId(youtubePlaylistId: String): Flow<List<SetVideoIdEntity>> =
         flow {
@@ -835,7 +836,7 @@ internal class LocalPlaylistRepositoryImpl(
                         emit(emptyList())
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun addYouTubePlaylistItem(
         youtubePlaylistId: String,
@@ -863,10 +864,10 @@ internal class LocalPlaylistRepositoryImpl(
                 }.onFailure {
                     emit(LocalResource.Error("FAILED"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun insertPairSongLocalPlaylist(pairSongLocalPlaylist: PairSongLocalPlaylist) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.insertPairSongLocalPlaylist(pairSongLocalPlaylist)
         }
 
@@ -876,7 +877,7 @@ internal class LocalPlaylistRepositoryImpl(
     ): Flow<List<PairSongLocalPlaylist>?> =
         flow {
             emit(localDataSource.getPlaylistPairSongByListPosition(playlistId, listPosition))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPlaylistPairSongByOffset(
         playlistId: Long,
@@ -885,7 +886,7 @@ internal class LocalPlaylistRepositoryImpl(
     ): Flow<List<PairSongLocalPlaylist>?> =
         flow {
             emit(localDataSource.getPlaylistPairSongByOffset(playlistId, offset, filterState))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPlaylistPairSongByTime(
         playlistId: Long,
@@ -900,7 +901,7 @@ internal class LocalPlaylistRepositoryImpl(
                     localDateTime,
                 ),
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPlaylistPairOfSong(
         playlistId: Long,
@@ -913,7 +914,7 @@ internal class LocalPlaylistRepositoryImpl(
                     playlistId,
                 ),
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun changePositionOfSongInPlaylist(
         playlistId: Long,
@@ -928,7 +929,7 @@ internal class LocalPlaylistRepositoryImpl(
             )
             delay(100)
             emit("Position updated")
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     /**
      * Move a song within a synced playlist.
@@ -1017,7 +1018,7 @@ internal class LocalPlaylistRepositoryImpl(
             }
 
             emit(LocalResource.Success("Position updated"))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     /**
      * Move a song within an unsynced local playlist.
@@ -1042,5 +1043,5 @@ internal class LocalPlaylistRepositoryImpl(
             }
 
             emit(LocalResource.Success("Position updated"))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

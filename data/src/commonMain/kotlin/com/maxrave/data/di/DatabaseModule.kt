@@ -14,6 +14,7 @@ import com.maxrave.data.db.getDatabaseBuilder
 import com.maxrave.domain.manager.DataStoreManager
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.spotify.Spotify
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.dsl.module
@@ -34,7 +35,7 @@ val databaseModule =
                 get<Converters>()
             )
                 .setDriver(BundledSQLiteDriver())
-                .setQueryCoroutineContext(Dispatchers.IO)
+                .setQueryCoroutineContext(ioDispatcher)
                 .build()
         }
         // DatabaseDao

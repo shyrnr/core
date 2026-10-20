@@ -4,6 +4,7 @@ import com.maxrave.domain.data.model.update.UpdateData
 import com.maxrave.domain.repository.UpdateRepository
 import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -29,7 +30,7 @@ internal class UpdateRepositoryImpl(
                 }.onFailure {
                     emit(Resource.Error<UpdateData>(it.localizedMessage ?: "Unknown error"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun checkForFdroidUpdate(): Flow<Resource<UpdateData>> =
         flow {
@@ -53,7 +54,7 @@ internal class UpdateRepositoryImpl(
                 }.onFailure {
                     emit(Resource.Error<UpdateData>(it.localizedMessage ?: "Unknown error"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getFdroidSigningKeys(): Flow<Resource<List<String>>> =
         flow {
@@ -61,5 +62,5 @@ internal class UpdateRepositoryImpl(
                 .getFdroidSigningKeys()
                 .onSuccess { emit(Resource.Success(it)) }
                 .onFailure { emit(Resource.Error<List<String>>(it.localizedMessage ?: "Unknown error")) }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

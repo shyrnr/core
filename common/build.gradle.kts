@@ -51,6 +51,7 @@ kotlin {
             dependencies {
                 implementation(libs.kotlin.stdlib)
                 // Add KMP dependencies here
+                api(libs.coroutines.core)
                 implementation(libs.kermit.logging)
                 // RollingFileLogWriter: the on-disk app log (see Logger.enableFileLogging).
                 implementation(libs.kermit.io)

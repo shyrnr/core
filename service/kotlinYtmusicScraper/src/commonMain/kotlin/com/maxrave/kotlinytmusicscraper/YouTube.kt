@@ -101,6 +101,7 @@ import io.ktor.client.engine.http
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.URLBuilder
 import io.ktor.http.parseQueryString
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
@@ -2393,7 +2394,7 @@ class YouTube {
                     Logger.d(TAG, "Player Response is null")
                     trySend(DownloadProgress.failed(it.message ?: "Player response is null"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     private fun Triple<Boolean, Float, Int>.isFailedDownload(): Boolean = first && second < 1f
 

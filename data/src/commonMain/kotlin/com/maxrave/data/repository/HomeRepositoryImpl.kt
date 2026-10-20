@@ -19,6 +19,7 @@ import com.maxrave.domain.repository.HomeRepository
 import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -208,7 +209,7 @@ internal class HomeRepositoryImpl(
                         emit(Resource.Error<Pair<String?, List<HomeItem>>>(error.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getHomeDataContinue(
         continueParam: String,
@@ -239,7 +240,7 @@ internal class HomeRepositoryImpl(
             }.onFailure {
                 emit(Resource.Error<Pair<String?, List<HomeItem>>>(it.message.toString()))
             }
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override fun getNewRelease(
         newReleaseString: String,
@@ -253,7 +254,7 @@ internal class HomeRepositoryImpl(
                 }.onFailure { error ->
                     emit(Resource.Error<List<HomeItem>>(error.message.toString()))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getChartData(countryCode: String): Flow<Resource<Chart>> =
         flow {
@@ -280,7 +281,7 @@ internal class HomeRepositoryImpl(
                         emit(Resource.Error<Chart>(error.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getMoodAndMomentsData(): Flow<Resource<Mood>> =
         flow {
@@ -326,7 +327,7 @@ internal class HomeRepositoryImpl(
                         }
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getMoodCategoryArtwork(params: String): Flow<String?> =
         flow {
@@ -356,7 +357,7 @@ internal class HomeRepositoryImpl(
                     ),
                 )
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     private suspend fun readMoodArtworkCache(): Map<String, MoodArtwork> =
         dataStoreManager.moodArtworkCache
@@ -382,7 +383,7 @@ internal class HomeRepositoryImpl(
                         emit(Resource.Error<MoodsMomentObject>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getGenreData(params: String): Flow<Resource<GenreObject>> =
         flow {
@@ -402,7 +403,7 @@ internal class HomeRepositoryImpl(
                         emit(Resource.Error<GenreObject>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getBrowsePage(
         browseId: String,
@@ -435,5 +436,5 @@ internal class HomeRepositoryImpl(
                 }.onFailure { e ->
                     emit(Resource.Error<BrowsePage>(e.message.toString()))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

@@ -35,6 +35,7 @@ import com.maxrave.kotlinytmusicscraper.parser.getPlaylistContinuation
 import com.maxrave.kotlinytmusicscraper.parser.getPlaylistRadioEndpoint
 import com.maxrave.kotlinytmusicscraper.parser.getPlaylistShuffleEndpoint
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -54,12 +55,12 @@ internal class PlaylistRepositoryImpl(
     override fun getAllPlaylists(limit: Int): Flow<List<PlaylistEntity>> =
         flow {
             emit(localDataSource.getAllPlaylists(limit))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPlaylist(id: String): Flow<PlaylistEntity?> =
         flow {
             emit(localDataSource.getPlaylist(id))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getLikedPlaylists(): Flow<List<PlaylistEntity>> =
         flow {
@@ -68,13 +69,13 @@ internal class PlaylistRepositoryImpl(
                     localDataSource.getLikedPlaylists(limit, offset)
                 },
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun insertPlaylist(playlistEntity: PlaylistEntity) =
-        withContext(Dispatchers.IO) { localDataSource.insertPlaylist(playlistEntity) }
+        withContext(ioDispatcher) { localDataSource.insertPlaylist(playlistEntity) }
 
     override suspend fun insertAndReplacePlaylist(playlistEntity: PlaylistEntity) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val oldPlaylist = getPlaylist(playlistEntity.id).firstOrNull()
             if (oldPlaylist != null) {
                 localDataSource.insertAndReplacePlaylist(
@@ -89,7 +90,7 @@ internal class PlaylistRepositoryImpl(
         }
 
     override suspend fun insertRadioPlaylist(playlistEntity: PlaylistEntity) =
-        withContext(Dispatchers.IO) { localDataSource.insertRadioPlaylist(playlistEntity) }
+        withContext(ioDispatcher) { localDataSource.insertRadioPlaylist(playlistEntity) }
 
     override suspend fun updatePlaylistLiked(
         playlistId: String,
@@ -122,12 +123,12 @@ internal class PlaylistRepositoryImpl(
     }
 
     override fun getAllDownloadedPlaylist(): Flow<List<PlaylistType>> =
-        flow { emit(localDataSource.getAllDownloadedPlaylist()) }.flowOn(Dispatchers.IO)
+        flow { emit(localDataSource.getAllDownloadedPlaylist()) }.flowOn(ioDispatcher)
 
     override fun getAllDownloadingPlaylist(): Flow<List<PlaylistType>> =
-        flow { emit(localDataSource.getAllDownloadingPlaylist()) }.flowOn(Dispatchers.IO)
+        flow { emit(localDataSource.getAllDownloadingPlaylist()) }.flowOn(ioDispatcher)
 
-    private suspend fun insertSetVideoId(setVideoId: SetVideoIdEntity) = withContext(Dispatchers.IO) { localDataSource.insertSetVideoId(setVideoId) }
+    private suspend fun insertSetVideoId(setVideoId: SetVideoIdEntity) = withContext(ioDispatcher) { localDataSource.insertSetVideoId(setVideoId) }
 
     override fun getRadio(
         radioId: String,
@@ -202,7 +203,7 @@ internal class PlaylistRepositoryImpl(
                             emit(Resource.Error<Pair<PlaylistBrowse, String?>>(exception.message.toString()))
                         }
                 }
-            }.flowOn(Dispatchers.IO)
+            }.flowOn(ioDispatcher)
         }
 
     override fun getRDATRadioData(
@@ -302,7 +303,7 @@ internal class PlaylistRepositoryImpl(
                         emit(Resource.Error(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getFullPlaylistData(
         playlistId: String,
@@ -434,7 +435,7 @@ internal class PlaylistRepositoryImpl(
                         emit(Resource.Error<PlaylistBrowse>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPlaylistData(
         playlistId: String,
@@ -553,7 +554,7 @@ internal class PlaylistRepositoryImpl(
                         )
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getLibraryPlaylist(): Flow<List<PlaylistsResult>?> =
         flow {
@@ -672,7 +673,7 @@ internal class PlaylistRepositoryImpl(
                         emit(null)
                     }
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getMixedForYou(): Flow<List<PlaylistsResult>?> =
         flow {
@@ -739,7 +740,7 @@ internal class PlaylistRepositoryImpl(
                         emit(null)
                     }
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun updateYourYouTubePlaylistTitle(
         playlistId: String,
@@ -753,22 +754,22 @@ internal class PlaylistRepositoryImpl(
                 }.onFailure {
                     emit(Resource.Error<String>(it.message ?: "Unknown error"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun insertYourYouTubePlaylist(yourYouTubePlaylist: YourYouTubePlaylistList) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.insertYourYouTubePlaylist(yourYouTubePlaylist)
         }
 
     override suspend fun deleteAllYourYouTubePlaylist() =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.deleteAllYourYouTubePlaylist()
         }
 
     override fun getYourYouTubePlaylistList(emailPageId: String): Flow<YourYouTubePlaylistList?> =
         flow {
             emit(localDataSource.getYourYouTubePlaylistList(emailPageId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getChartPlaylist(): Flow<Resource<List<ChartItem>>> =
         flow {
@@ -788,5 +789,5 @@ internal class PlaylistRepositoryImpl(
                     exception.printStackTrace()
                     emit(Resource.Error<List<ChartItem>>(exception.message ?: "Unknown error"))
                 }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

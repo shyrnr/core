@@ -10,6 +10,7 @@ import com.maxrave.domain.repository.ArtistRepository
 import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import com.maxrave.domain.manager.DataStoreManager
@@ -28,15 +29,15 @@ internal class ArtistRepositoryImpl(
     override fun getAllArtists(limit: Int): Flow<List<ArtistEntity>> =
         flow {
             emit(localDataSource.getAllArtists(limit))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getArtistById(id: String): Flow<ArtistEntity?> =
         flow {
             emit(localDataSource.getArtist(id))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun insertArtist(artistEntity: ArtistEntity) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.insertArtist(artistEntity)
         }
 
@@ -56,17 +57,17 @@ internal class ArtistRepositoryImpl(
         channelId: String,
         nameLogoUrl: String?,
         nameLogoColor: String?,
-    ) = withContext(Dispatchers.IO) {
+    ) = withContext(ioDispatcher) {
         localDataSource.updateArtistNameLogo(channelId, nameLogoUrl, nameLogoColor)
     }
 
     override suspend fun getArtistMotion(channelId: String): ArtistMotionEntity? =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.getArtistMotion(channelId)
         }
 
     override suspend fun upsertArtistMotion(motion: ArtistMotionEntity) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.upsertArtistMotion(motion)
         }
 
@@ -93,7 +94,7 @@ internal class ArtistRepositoryImpl(
             if (dataStoreManager.syncFollowToYouTube.first() != DataStoreManager.TRUE) {
                 return@withContext null
             }
-            withContext(Dispatchers.IO) {
+            withContext(ioDispatcher) {
                 setSubscription(channelId, followedStatus == 1)
             }
         }
@@ -111,7 +112,7 @@ internal class ArtistRepositoryImpl(
                 if (setSubscription(artist.channelId, true)) done++
             }
             emit(done to followed.size)
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     /** One subscribe/unsubscribe call, logged on failure. Returns whether the account was updated. */
     private suspend fun setSubscription(
@@ -137,7 +138,7 @@ internal class ArtistRepositoryImpl(
                     localDataSource.getFollowedArtists(limit, offset)
                 },
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun updateArtistInLibrary(
         inLibrary: LocalDateTime,
@@ -161,5 +162,5 @@ internal class ArtistRepositoryImpl(
                         emit(Resource.Error<ArtistBrowse>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

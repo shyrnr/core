@@ -11,6 +11,7 @@ import com.maxrave.domain.repository.ImportProgress
 import com.maxrave.domain.repository.ImportRepository
 import com.maxrave.domain.utils.MusicVideoType
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -103,7 +104,7 @@ internal class ImportRepositoryImpl(
                 Logger.e(TAG, "import: failed while writing - ${throwable.message}")
                 emit(ImportProgress.Error(throwable.message ?: invalidFileMessage))
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }
 
 /**

@@ -15,6 +15,7 @@ import com.maxrave.domain.repository.PodcastRepository
 import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -188,22 +189,22 @@ internal class PodcastRepositoryImpl(
     override fun insertPodcast(podcastsEntity: PodcastsEntity) =
         flow {
             emit(localDataSource.insertPodcast(podcastsEntity))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun insertEpisodes(episodes: List<EpisodeEntity>) =
         flow {
             emit(localDataSource.insertEpisodes(episodes))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPodcastWithEpisodes(podcastId: String): Flow<PodcastWithEpisodes?> =
         flow {
             emit(localDataSource.getPodcastWithEpisodes(podcastId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAllPodcasts(limit: Int): Flow<List<PodcastsEntity>> =
         flow {
             emit(localDataSource.getAllPodcasts(limit))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getAllPodcastWithEpisodes(): Flow<List<PodcastWithEpisodes>> =
         flow {
@@ -212,29 +213,29 @@ internal class PodcastRepositoryImpl(
                     localDataSource.getAllPodcastWithEpisodes(limit, offset)
                 }
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getPodcast(podcastId: String): Flow<PodcastsEntity?> =
         flow {
             emit(localDataSource.getPodcast(podcastId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getEpisode(videoId: String): Flow<EpisodeEntity?> =
         flow {
             emit(localDataSource.getEpisode(videoId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun deletePodcast(podcastId: String) =
         flow {
             emit(localDataSource.deletePodcast(podcastId))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun favoritePodcast(
         podcastId: String,
         favorite: Boolean,
     ) = flow {
         emit(localDataSource.favoritePodcast(podcastId, favorite))
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override fun getPodcastEpisodes(podcastId: String): Flow<List<EpisodeEntity>> =
         flow {
@@ -243,7 +244,7 @@ internal class PodcastRepositoryImpl(
                     localDataSource.getPodcastEpisodes(podcastId, limit, offset)
                 }
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getFavoritePodcasts(): Flow<List<PodcastsEntity>> =
         flow {
@@ -252,10 +253,10 @@ internal class PodcastRepositoryImpl(
                     localDataSource.getFavoritePodcasts(limit, offset)
                 }
             )
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun updatePodcastInLibraryNow(id: String) =
         flow {
             emit(localDataSource.updatePodcastInLibraryNow(id))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }

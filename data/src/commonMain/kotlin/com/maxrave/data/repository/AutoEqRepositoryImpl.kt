@@ -7,6 +7,7 @@ import com.maxrave.domain.data.entities.AutoEqIndexMetaEntity
 import com.maxrave.domain.data.model.autoeq.AutoEqCurve
 import com.maxrave.domain.repository.AutoEqRepository
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simpmusic.autoeq.AutoEq
@@ -26,17 +27,17 @@ internal class AutoEqRepositoryImpl(
         query: String,
         limit: Int,
     ): List<AutoEqEntryEntity> =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.searchAutoEqEntries(query.trim(), limit)
         }
 
     override suspend fun cachedCount(): Int =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.getAutoEqEntryCount()
         }
 
     override suspend fun refreshIndex(force: Boolean): Boolean =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val meta = localDataSource.getAutoEqIndexMeta()
             val cached = localDataSource.getAutoEqEntryCount()
             val now = Clock.System.now().toEpochMilliseconds()
@@ -82,7 +83,7 @@ internal class AutoEqRepositoryImpl(
         }
 
     override suspend fun cachedCurvePaths(): Set<String> =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.getAutoEqCachedCurvePaths().toSet()
         }
 
@@ -94,7 +95,7 @@ internal class AutoEqRepositoryImpl(
      * downloaded means a headphone already used can be picked again with no connection.
      */
     override suspend fun loadCurve(entry: AutoEqEntryEntity): AutoEqCurve? =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.getAutoEqCurve(entry.path)?.let { cached ->
                 val bands = cached.bandsDb.split(",").mapNotNull { it.trim().toFloatOrNull() }
                 if (bands.isNotEmpty()) return@withContext AutoEqCurve(bands, cached.preampDb)

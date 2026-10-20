@@ -7,6 +7,7 @@ import com.maxrave.domain.repository.LyricsRomanizerRepository
 import com.maxrave.logger.Logger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
@@ -92,7 +93,7 @@ class LyricsRomanizerRepositoryImpl(
     // either — a failure is logged, and Japanese lines are shown as written.
     private val scope =
         CoroutineScope(
-            SupervisorJob() + Dispatchers.IO +
+            SupervisorJob() + ioDispatcher +
                 CoroutineExceptionHandler { _, failure ->
                     Logger.e(TAG, "Japanese dictionary: unexpected failure", failure)
                 },

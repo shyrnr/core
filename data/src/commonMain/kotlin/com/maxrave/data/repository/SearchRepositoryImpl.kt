@@ -19,6 +19,7 @@ import com.maxrave.domain.repository.SearchRepository
 import com.maxrave.domain.utils.Resource
 import com.maxrave.kotlinytmusicscraper.YouTube
 import com.maxrave.logger.Logger
+import com.maxrave.common.dispatcher.ioDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -32,15 +33,15 @@ internal class SearchRepositoryImpl(
     override fun getSearchHistory(): Flow<List<SearchHistory>> =
         flow {
             emit(localDataSource.getSearchHistory())
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun insertSearchHistory(searchHistory: SearchHistory): Flow<Long> =
         flow {
             emit(localDataSource.insertSearchHistory(searchHistory))
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override suspend fun deleteSearchHistory() =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localDataSource.deleteSearchHistory()
         }
 
@@ -78,7 +79,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<SongsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataVideo(query: String): Flow<Resource<ArrayList<VideosResult>>> =
         flow {
@@ -114,7 +115,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<VideosResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataPodcast(query: String): Flow<Resource<ArrayList<PlaylistsResult>>> =
         flow {
@@ -151,7 +152,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<PlaylistsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataFeaturedPlaylist(query: String): Flow<Resource<ArrayList<PlaylistsResult>>> =
         flow {
@@ -186,7 +187,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<PlaylistsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataArtist(query: String): Flow<Resource<ArrayList<ArtistsResult>>> =
         flow {
@@ -221,7 +222,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<ArtistsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataAlbum(query: String): Flow<Resource<ArrayList<AlbumsResult>>> =
         flow {
@@ -256,7 +257,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<AlbumsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSearchDataPlaylist(query: String): Flow<Resource<ArrayList<PlaylistsResult>>> =
         flow {
@@ -291,7 +292,7 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<ArrayList<PlaylistsResult>>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 
     override fun getSuggestQuery(query: String): Flow<Resource<SearchSuggestions>> =
         flow {
@@ -305,5 +306,5 @@ internal class SearchRepositoryImpl(
                         emit(Resource.Error<SearchSuggestions>(e.message.toString()))
                     }
             }
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(ioDispatcher)
 }
