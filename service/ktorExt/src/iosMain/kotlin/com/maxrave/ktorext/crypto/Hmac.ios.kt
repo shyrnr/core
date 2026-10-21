@@ -11,8 +11,8 @@ import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA384
 import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA512
 import kotlinx.cinterop.convert
 import kotlinx.cinterop.refTo
-import platform.Foundation.NSDate
 import kotlin.io.encoding.Base64
+import kotlin.time.Clock
 
 actual class Hmac actual constructor(
     private val algorithm: String,
@@ -23,7 +23,7 @@ actual class Hmac actual constructor(
     private val normalizedAlgorithm = algorithm.uppercase().replace("-", "").replace("_", "")
 
     actual fun getMacTimestampPair(uri: String): Pair<String, String> {
-        val timestamp = (NSDate().timeIntervalSince1970 * 1_000.0).toLong().toString()
+        val timestamp = Clock.System.now().toEpochMilliseconds().toString()
         return generateHmac("$timestamp$uri") to timestamp
     }
 
@@ -47,7 +47,7 @@ actual class Hmac actual constructor(
 
     actual fun isValidTimestamp(timestamp: String): Boolean {
         val requestTime = timestamp.toLongOrNull() ?: return false
-        val currentTime = (NSDate().timeIntervalSince1970 * 1_000.0).toLong()
+        val currentTime = Clock.System.now().toEpochMilliseconds()
         return currentTime - requestTime < tokenTtl
     }
 
@@ -63,8 +63,8 @@ actual class Hmac actual constructor(
                 else -> throw IllegalArgumentException("Unsupported HMAC algorithm: $algorithm")
             }
         val result = ByteArray(outputSize)
-        val safeKey = key.ifEmpty { byteArrayOf(0) }
-        val safeData = data.ifEmpty { byteArrayOf(0) }
+        val safeKey = if (key.size == 0) byteArrayOf(0) else key
+        val safeData = if (data.size == 0) byteArrayOf(0) else data
 
         val keyPointer = safeKey.refTo(0)
         val dataPointer = safeData.refTo(0)
