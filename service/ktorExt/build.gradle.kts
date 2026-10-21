@@ -36,6 +36,7 @@ kotlin {
             cinterops {
                 val commonCrypto by creating {
                     definitionFile.set(project.file("src/nativeInterop/cinterop/commonCrypto.def"))
+                    packageName("com.maxrave.ktorext.crypto.commoncrypto")
                 }
             }
         }
@@ -49,6 +50,7 @@ kotlin {
             cinterops {
                 val commonCrypto by creating {
                     definitionFile.set(project.file("src/nativeInterop/cinterop/commonCrypto.def"))
+                    packageName("com.maxrave.ktorext.crypto.commoncrypto")
                 }
             }
         }
