@@ -1,3 +1,0 @@
-language = Objective-C
-modules = CommonCrypto
-package = com.maxrave.ktorext.crypto.commoncrypto
