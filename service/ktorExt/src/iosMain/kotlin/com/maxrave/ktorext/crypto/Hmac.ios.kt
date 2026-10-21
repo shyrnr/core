@@ -2,16 +2,15 @@
 
 package com.maxrave.ktorext.crypto
 
-import kotlinx.cinterop.addressOf
+import com.maxrave.ktorext.crypto.commoncrypto.CCHmac
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgMD5
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA1
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA224
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA256
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA384
+import com.maxrave.ktorext.crypto.commoncrypto.kCCHmacAlgSHA512
 import kotlinx.cinterop.convert
-import kotlinx.cinterop.usePinned
-import platform.CommonCrypto.CCHmac
-import platform.CommonCrypto.kCCHmacAlgMD5
-import platform.CommonCrypto.kCCHmacAlgSHA1
-import platform.CommonCrypto.kCCHmacAlgSHA224
-import platform.CommonCrypto.kCCHmacAlgSHA256
-import platform.CommonCrypto.kCCHmacAlgSHA384
-import platform.CommonCrypto.kCCHmacAlgSHA512
+import kotlinx.cinterop.refTo
 import platform.Foundation.NSDate
 import kotlin.io.encoding.Base64
 
@@ -67,32 +66,26 @@ actual class Hmac actual constructor(
         val safeKey = key.ifEmpty { byteArrayOf(0) }
         val safeData = data.ifEmpty { byteArrayOf(0) }
 
-        safeKey.usePinned { keyPinned ->
-            safeData.usePinned { dataPinned ->
-                result.usePinned { resultPinned ->
-                    val keyPointer = keyPinned.addressOf(0)
-                    val dataPointer = dataPinned.addressOf(0)
-                    val resultPointer = resultPinned.addressOf(0)
-                    val keyLength = key.size.convert()
-                    val dataLength = data.size.convert()
+        val keyPointer = safeKey.refTo(0)
+        val dataPointer = safeData.refTo(0)
+        val resultPointer = result.refTo(0)
+        val keyLength = key.size.convert()
+        val dataLength = data.size.convert()
 
-                    when (normalizedAlgorithm) {
-                        "HMACMD5", "MD5" ->
-                            CCHmac(kCCHmacAlgMD5, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        "HMACSHA1", "SHA1" ->
-                            CCHmac(kCCHmacAlgSHA1, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        "HMACSHA224", "SHA224" ->
-                            CCHmac(kCCHmacAlgSHA224, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        "HMACSHA256", "SHA256" ->
-                            CCHmac(kCCHmacAlgSHA256, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        "HMACSHA384", "SHA384" ->
-                            CCHmac(kCCHmacAlgSHA384, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        "HMACSHA512", "SHA512" ->
-                            CCHmac(kCCHmacAlgSHA512, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
-                        else -> throw IllegalArgumentException("Unsupported HMAC algorithm: $algorithm")
-                    }
-                }
-            }
+        when (normalizedAlgorithm) {
+            "HMACMD5", "MD5" ->
+                CCHmac(kCCHmacAlgMD5, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            "HMACSHA1", "SHA1" ->
+                CCHmac(kCCHmacAlgSHA1, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            "HMACSHA224", "SHA224" ->
+                CCHmac(kCCHmacAlgSHA224, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            "HMACSHA256", "SHA256" ->
+                CCHmac(kCCHmacAlgSHA256, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            "HMACSHA384", "SHA384" ->
+                CCHmac(kCCHmacAlgSHA384, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            "HMACSHA512", "SHA512" ->
+                CCHmac(kCCHmacAlgSHA512, keyPointer, keyLength, dataPointer, dataLength, resultPointer)
+            else -> throw IllegalArgumentException("Unsupported HMAC algorithm: $algorithm")
         }
         return result
     }

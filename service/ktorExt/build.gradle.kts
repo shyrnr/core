@@ -32,11 +32,25 @@ kotlin {
         binaries.framework {
             baseName = xcfName
         }
+        compilations.getByName("main") {
+            cinterops {
+                val commonCrypto by creating {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/commonCrypto.def"))
+                }
+            }
+        }
     }
 
     iosSimulatorArm64 {
         binaries.framework {
             baseName = xcfName
+        }
+        compilations.getByName("main") {
+            cinterops {
+                val commonCrypto by creating {
+                    definitionFile.set(project.file("src/nativeInterop/cinterop/commonCrypto.def"))
+                }
+            }
         }
     }
 
