@@ -1,2 +1,2 @@
-headers = CommonCrypto/CommonHMAC.h
+modules = CommonCrypto
 package = com.maxrave.ktorext.crypto.commoncrypto
